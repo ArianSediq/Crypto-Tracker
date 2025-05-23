@@ -1,0 +1,188 @@
+/* ======= Grundläggande styling ======= */
+body {
+    font-family: 'Arial', sans-serif; /* Standardtypsnitt */
+    background-color: #072d57; /* Uppdaterad bakgrund – ny design */
+    color: #333; /* Standardtextfärg */
+    margin: 0; /* Reset */
+    padding: 0;
+    text-align: center; /* Centrerad text */
+}
+
+/* ======= Container ======= */
+/* Vi använder den mer "utspäckade" containern för innehåll */
+.container {
+    max-width: 800px; /* Bredd */
+    margin: 50px auto; /* Centrerad */
+    background: #fbdbdb; /* bakgrund */
+    padding: 40px; /* Luft runt innehållet */
+    border-radius: 8px; /* Rundade hörn */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Skugga */
+    text-align: center;
+}
+
+/* ======= Formulärfält och knappar ======= */
+input, button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* ======= Länkar ======= */
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ======= Rubriker ======= */
+h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* ==== Header ==== */
+header {
+    background: #f6c7c7;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+header .logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+header nav ul li {
+    margin-left: 20px;
+}
+header nav ul li a {
+    text-decoration: none;
+    color: #333;
+    transition: color 0.3s ease;
+}
+header nav ul li a:hover {
+    color: #007bff;
+}
+
+/* ==== CTA-Knappar ==== */
+.cta-buttons {
+    margin-top: 20px;
+}
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px;
+    background: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+.btn:hover {
+    background: #0056b3;
+}
+
+/* ==== Footer ==== */
+footer {
+    background: #f6c7c7;
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+}
+footer p {
+    margin: 0;
+}
+
+/* ======= Dashboard-specifika inställningar ======= */
+
+/* Sidonavigering i dashboarden */
+.page-nav {
+    margin: 20px 0;
+}
+
+.page-nav a {
+    display: inline-block;
+    background-color: #007bff;
+    color: #f8f8f8;
+    padding: 10px 20px;
+    margin-right: 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.page-nav a:hover {
+    background-color: #0056b3;
+}
+
+/* Sektioner på dashboarden */
+.dashboard-section {
+    background-color: #f6c7c7;
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Rubriker inom dashboarden */
+.dashboard-section h3 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* Tabellöversikt för portföljen */
+.dashboard-section table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.dashboard-section table th,
+.dashboard-section table td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+.dashboard-section table th {
+    background-color: #f1f1f1;
+    color: #333;
+    font-weight: bold;
+}
+
+/* ===== Responsiv design ===== */
+@media (max-width: 768px) {
+    header nav ul {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .page-nav a {
+        margin: 10px 0;
+        width: 100%;
+        text-align: center;
+    }
+}
