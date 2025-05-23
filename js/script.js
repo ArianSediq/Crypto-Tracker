@@ -3,3 +3,4 @@ async function fetchCryptoData(symbol) {
     const data = await response.json();
     document.getElementById("crypto-price").innerText = `Pris: ${data[symbol].usd} USD`;
 }
+//Tja Hej Salam/Salle
