@@ -235,3 +235,30 @@ footer p {
     display: block;
 }
 
+.crypto-result {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.search-result {
+    padding: 15px;
+    margin-bottom: 15px; /* Adds space between search results */
+    background: linear-gradient(135deg, rgb(16, 162, 21) 0%, rgb(28, 200, 34) 100%);
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-result:last-child {
+    margin-bottom: 0; /* Removes extra space after the last item */
+}
+
+.search-result:hover {
+    background: linear-gradient(135deg, rgb(13, 143, 18) 0%, rgb(23, 180, 29) 100%);
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px);
+}

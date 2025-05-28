@@ -8,12 +8,14 @@
 </head>
 <body>
     <?php include '../header.php'; ?> <!-- Header -->
+
     <div class="container">
         <h2>Sök Kryptovalutor</h2>
-        <input type="text" id="crypto-symbol" placeholder="Ange kryptovaluta (t.ex. bitcoin)">
-        <button onclick="fetchCryptoData(document.getElementById('crypto-symbol').value)">Sök</button>
+        <input type="text" id="crypto-symbol" placeholder="Ange kryptovaluta (ex. bitcoin)">
+        <button id="search-button">Sök</button>
         <p id="crypto-price"></p>
     </div>
+
     <?php include '../php/footer.php'; ?> <!-- Footer -->
 </body>
 </html>
