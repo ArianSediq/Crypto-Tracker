@@ -186,3 +186,52 @@ footer p {
         text-align: center;
     }
 }
+
+/* crypto prices */
+
+.crypto-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-start; /* Aligns left */
+    align-items: flex-start; /* Aligns top */
+    width: 100%;
+    background-color: #f6c7c7;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    text-align: left;
+     /* Spacing from the main content */
+}
+
+.crypto-container h3 {
+    margin-top: 18px;
+    text-align: center;
+    color: #333;
+}
+
+.crypto {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #007bff;
+    margin: 13px 8px;
+}
+
+.error {
+    color: red;
+    font-size: 16px;
+}
+
+.crypto-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.crypto-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: block;
+}
+
