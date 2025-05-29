@@ -32,12 +32,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 const logoUrl = `https://static.coincap.io/assets/icons/${coin.symbol.toLowerCase()}@2x.png`;
 
                 // Create a new div for each result
-                const resultItem = document.createElement("div");
+                const resultItem = document.createElement("a"); // Change from <div> to <a>
                 resultItem.classList.add("search-result");
+                resultItem.href = `coin_info.php?id=${coin.id}`; // Pass coin ID in URL
                 resultItem.innerHTML = `
                 <img src="${logoUrl}" alt="${coin.name} Logo" class="crypto-logo">
                 <p><strong>${coin.name} (${coin.symbol}):</strong> $${coin.price_usd}</p>
             `;
+
 
                 // Append results dynamically
                 resultContainer.appendChild(resultItem);

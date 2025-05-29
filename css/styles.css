@@ -228,7 +228,7 @@ footer p {
     margin-bottom: 10px;
 }
 
-.crypto-logo {
+.crypto-logo-home {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -244,8 +244,13 @@ footer p {
 .search-result {
     padding: 15px;
     margin-bottom: 15px; /* Adds space between search results */
-    background: linear-gradient(135deg, rgb(16, 162, 21) 0%, rgb(28, 200, 34) 100%);
+    background: linear-gradient(135deg,rgb(28, 200, 34) 0%, #d6b4b4 30%);
+    background-size: 200% 200%; /* Enlarged background for smooth shifting  */
+    transition: all 0.5s ease-in-out; /* Smooth effect */
     border-radius: 8px;
+    color: black;
+    font-size: 20px;
+    text-decoration: none;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease-in-out;
     display: flex;
@@ -258,7 +263,71 @@ footer p {
 }
 
 .search-result:hover {
-    background: linear-gradient(135deg, rgb(13, 143, 18) 0%, rgb(23, 180, 29) 100%);
+    background-position: right center; /* Gradually shifts gradient */
+   /* background: linear-gradient(135deg, #fbdbdb 0%, rgb(28, 200, 34) 100%); */
     box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
     transform: translateY(-3px);
+    text-decoration: none;
 }
+
+/* Container */
+.coin-info-container {
+    max-width: 80%;
+    margin: 40px auto;
+    padding: 20px;
+    border-radius: 12px; 
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+    color: black;
+    background: linear-gradient(135deg,rgb(28, 200, 34) 0%, #d6b4b4 30%);
+}
+
+
+.crypto-logo {
+    width: 80px; /* Larger size */
+    height: 80px;
+}
+
+/* Text styling */
+h2 {
+    font-size: 26px;
+    margin: 0;
+}
+
+.coin-details p {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+
+.coin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Keep elements in one row */
+    padding: 0px;
+}
+
+.coin-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.create-post-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 20px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.create-post-btn:hover {
+    background-color: #0056b3;
+    text-decoration: none;
+}
+
+
+

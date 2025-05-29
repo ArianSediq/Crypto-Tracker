@@ -34,7 +34,7 @@ include 'api/fetch_crypto.php'; // Load API logic
       foreach ($data as $coin) {
         $logo_url = "https://static.coincap.io/assets/icons/" . strtolower($coin['symbol']) . "@2x.png";
         echo "<div class='crypto-item'>";
-        echo "<img src='{$logo_url}' alt='{$coin['name']} Logo' class='crypto-logo'>";
+        echo "<img src='{$logo_url}' alt='{$coin['name']} Logo' class='crypto-logo-home'>";
         echo "<p><strong>{$coin['name']}:</strong> $" . number_format($coin['price_usd'], 2) . "</p>";
         echo "</div>";
       }
