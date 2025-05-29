@@ -40,12 +40,19 @@ include 'api/fetch_crypto.php'; // Load API logic
       }
       ?>
     </div>
-
-    <!-- User Welcome Section -->
     <div class="container">
       <h1>Välkommen till Cryptotracker</h1>
       <p>Du är nu inloggad!</p>
+
+      <div id="crypto-news">
+        <p>🔄 Laddar senaste kryptonyheter...</p>
+      </div>
     </div>
+
+    <script src="js/news.js"></script>
+
+    <!-- User Welcome Section -->
+
 
   <?php } ?>
 

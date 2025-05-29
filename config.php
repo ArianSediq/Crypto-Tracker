@@ -10,7 +10,7 @@ define('DB_FILE', __DIR__ . '/db/crypto_tracker.sqlite');
 
 // API URL:er för eksternt data-hämtning:
 // API_URL_COIN: Använder CoinGecko API för kryptodata.
-define('API_URL_COIN', 'https://api.coingecko.com/api/v3/');
+define('API_URL_COIN', 'https://api.coingecko.com/api/v3/'); //Använder en annan!!!
 
 // API_URL_NEWS: Använder Crypto News API för kryptorelaterade nyheter.
 define('API_URL_NEWS', 'https://cryptonews-api.com/');
