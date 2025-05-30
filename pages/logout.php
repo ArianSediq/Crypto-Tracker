@@ -1,11 +1,15 @@
 <?php
-// start
+// Starta sessionen om den inte redan är igång
 session_start();
 
-// destroy
+// Ta bort alla sessionsvariabler
+session_unset();
+
+// Förstör sessionen
 session_destroy();
 
-// redirect
-header("Location: login.php");
+// Skicka användaren till startsidan
+header("Location: ../index.php");
 exit;
 ?>
+

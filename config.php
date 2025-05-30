@@ -4,15 +4,18 @@
  * Konfiguration för Cryptotracker-projektet
  */
 
-// Definierar sökvägen till SQLite-databasen.
-// __DIR__ refererar till mappen där config.php ligger, och vi antar att databasen ligger i mappen "db".
+//Sökväg till SQLite-databasen (ligger i /db/)
 define('DB_FILE', __DIR__ . '/db/crypto_tracker.sqlite');
 
-// API URL:er för eksternt data-hämtning:
-// API_URL_COIN: Använder CoinGecko API för kryptodata.
-define('API_URL_COIN', 'https://api.coingecko.com/api/v3/'); //Använder en annan!!!
-
-// API_URL_NEWS: Använder Crypto News API för kryptorelaterade nyheter.
+//API-URL:er
+define('API_URL_COIN', 'https://api.coingecko.com/api/v3/');
 define('API_URL_NEWS', 'https://cryptonews-api.com/');
-?>
 
+//PDO-databasanslutning (SQLite)
+try {
+    $pdo = new PDO("sqlite:" . DB_FILE);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Kunde inte ansluta till databasen: " . $e->getMessage());
+}
+?>
