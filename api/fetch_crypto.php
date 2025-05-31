@@ -1,5 +1,5 @@
 <?php
-session_start(); // Start session for caching
+require_once __DIR__ . '/../php/session.php';
 
 // Cache duration (in seconds)
 $cache_time = 120;

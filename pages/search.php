@@ -9,11 +9,14 @@
 <body>
     <?php include '../header.php'; ?> <!-- Header -->
 
-    <div class="container">
+    <div class="container search-container">
         <h2>Sök Kryptovalutor</h2>
-        <input type="text" id="crypto-symbol" placeholder="Ange kryptovaluta (ex. bitcoin)">
-        <button id="search-button">Sök</button>
-        <p id="crypto-price"></p>
+        <div class="search-box">
+            <input type="text" id="crypto-symbol" placeholder="Sök efter namn eller symbol (t.ex. Bitcoin eller BTC)">
+            <button id="search-button">Sök</button>
+        </div>
+        <div class="search-status" id="search-status"></div>
+        <div class="search-results" id="crypto-price"></div>
     </div>
 
     <?php include '../php/footer.php'; ?> <!-- Footer -->

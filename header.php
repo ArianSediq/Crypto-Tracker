@@ -1,28 +1,23 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/php/session.php';
 ?>
-<!-- HEADER START -->
 <header>
-    <div class="logo">Cryptotracker</div>
-
     <nav>
+        <div class="logo">
+            <a href="/Crypto-Tracker/">CryptoTracker</a>
+        </div>
         <ul>
-            <!-- Länkar pekar alltid från root med fast sökväg -->
-            <li><a href="/new%20website/Crypto-Tracker/index.php">Hem</a></li>
-            <li><a href="/new%20website/Crypto-Tracker/pages/dashboard.php">Dashboard</a></li>
-            <li><a href="/new%20website/Crypto-Tracker/pages/portfolio.php">Portfölj</a></li>
-            <li><a href="/new%20website/Crypto-Tracker/pages/search.php">Sök</a></li>
-
+            <li><a href="/Crypto-Tracker/" <?= $_SERVER['REQUEST_URI'] == '/Crypto-Tracker/' ? 'class="active"' : '' ?>>Hem</a></li>
+            <li><a href="/Crypto-Tracker/pages/search.php" <?= strpos($_SERVER['REQUEST_URI'], '/search.php') ? 'class="active"' : '' ?>>Sök</a></li>
             <?php if (isset($_SESSION['user_id'])): ?>
-                <li><a href="/new%20website/Crypto-Tracker/pages/profile.php">Min profil</a></li>
-                <li><a href="/new%20website/Crypto-Tracker/pages/logout.php">Logga ut</a></li>
+                <li><a href="/Crypto-Tracker/pages/portfolio.php" <?= strpos($_SERVER['REQUEST_URI'], '/portfolio.php') ? 'class="active"' : '' ?>>Portfolio</a></li>
+                <li><a href="/Crypto-Tracker/pages/discussions.php" <?= strpos($_SERVER['REQUEST_URI'], '/discussions.php') ? 'class="active"' : '' ?>>Diskussioner</a></li>
+                <li><a href="/Crypto-Tracker/pages/profile.php" <?= strpos($_SERVER['REQUEST_URI'], '/profile.php') ? 'class="active"' : '' ?>>Min Profil</a></li>
+                <li><a href="/Crypto-Tracker/pages/logout.php">Logga ut</a></li>
             <?php else: ?>
-                <li><a href="/new%20website/Crypto-Tracker/pages/login.php">Logga in</a></li>
-                <li><a href="/new%20website/Crypto-Tracker/pages/register.php">Registrera</a></li>
+                <li><a href="/Crypto-Tracker/pages/login.php" <?= strpos($_SERVER['REQUEST_URI'], '/login.php') ? 'class="active"' : '' ?>>Logga in</a></li>
+                <li><a href="/Crypto-Tracker/pages/register.php" <?= strpos($_SERVER['REQUEST_URI'], '/register.php') ? 'class="active"' : '' ?>>Registrera</a></li>
             <?php endif; ?>
         </ul>
     </nav>
 </header>
-<!-- HEADER SLUT -->
