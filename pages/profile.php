@@ -54,7 +54,7 @@ try {
     <?php include '../header.php'; ?>
     
     <div class="container">
-        <h1>Min Profil</h1>
+        
         
         <?php if (!empty($message)): ?>
             <div class="alert alert-success">
@@ -70,6 +70,7 @@ try {
 
         <?php if ($user): ?>
             <div class="profile-card">
+            <h1>Min Profil</h1>
                 <h2><?= htmlspecialchars($user['username']) ?></h2>
                 <p><strong>Email:</strong> <?= htmlspecialchars($user['email']) ?></p>
                 <p><strong>Medlem sedan:</strong> <?= date('Y-m-d', strtotime($user['created_at'])) ?></p>
