@@ -129,7 +129,7 @@ try {
                     
                     <?php if ($post['image_url']): ?>
                         <div class="post-image">
-                            <img src="<?= htmlspecialchars($post['image_url']) ?>" alt="Inläggsbild">
+                            <img src="<?= htmlspecialchars('../' . $post['image_url']) ?>" alt="Inläggsbild">
                         </div>
                     <?php endif; ?>
                     
@@ -174,16 +174,18 @@ try {
                     </p>
                     <div class="post-content">${data.content}</div>
                     ${data.image_url ? `<div class="post-image">
-                        <img src="${data.image_url}" alt="Inläggsbild">
+                        <img src="../${data.image_url}" alt="Inläggsbild">
                     </div>` : ''}
                 `;
                 modal.style.display = "block";
+                document.body.classList.add('modal-open');
             });
     }
     
     // Stäng modal när man klickar på X
     document.querySelector('.close').onclick = function() {
         document.getElementById('postModal').style.display = "none";
+        document.body.classList.remove('modal-open');
     }
     
     // Stäng modal när man klickar utanför
@@ -191,6 +193,7 @@ try {
         const modal = document.getElementById('postModal');
         if (event.target == modal) {
             modal.style.display = "none";
+            document.body.classList.remove('modal-open');
         }
     }
     </script>
