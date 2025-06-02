@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
         event.preventDefault(); // Prevent form submission until validation passes
 
         const username = document.getElementById("username").value.trim();
+        const email = document.getElementById("email").value.trim();
         const password = document.getElementById("password").value;
         const errorContainer = document.getElementById("error-message");
         errorContainer.innerHTML = ""; // Clear previous errors
@@ -14,6 +15,12 @@ document.addEventListener("DOMContentLoaded", function () {
         // Username validation (at least 3 characters, no special characters)
         if (username.length < 3 || !/^[a-zA-Z0-9]+$/.test(username)) {
             errors.push("❌ Användarnamnet måste vara minst 3 tecken och kan bara innehålla bokstäver och siffror.");
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            errors.push("❌ Vänligen ange en giltig e-postadress.");
         }
 
         // Password validation (at least 8 characters, including a number)

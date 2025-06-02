@@ -5,7 +5,7 @@
  */
 
 //Sökväg till SQLite-databasen (ligger i /db/)
-define('DB_FILE', __DIR__ . '/db/crypto_tracker.sqlite');
+define('DB_FILE', __DIR__ . '/db/crypto_tracker.db');
 
 //API-URL:er
 define('API_URL_COIN', 'https://api.coingecko.com/api/v3/');

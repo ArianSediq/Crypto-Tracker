@@ -3,24 +3,22 @@
 include '../php/session.php';
 include '../config.php';
 
-// Öppna databasen
-$db = new SQLite3(DB_FILE);
+// Använd PDO-anslutningen från config.php
+$db = $pdo;
 
 // Hämta användardata
 $user_id = $_SESSION['user_id'];
 $userQuery = $db->prepare("SELECT * FROM users WHERE id = :user_id");
-$userQuery->bindValue(':user_id', $user_id, SQLITE3_INTEGER);
-$userResult = $userQuery->execute()->fetchArray(SQLITE3_ASSOC);
+$userQuery->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+$userQuery->execute();
+$userResult = $userQuery->fetch(PDO::FETCH_ASSOC);
 $username = $userResult ? $userResult['username'] : 'Användare';
 
 // Hämta portföljinnehav för den inloggade användaren
 $portfolioQuery = $db->prepare("SELECT crypto_symbol, amount FROM portfolio WHERE user_id = :user_id");
-$portfolioQuery->bindValue(':user_id', $user_id, SQLITE3_INTEGER);
-$portfolioResult = $portfolioQuery->execute();
-$portfolioEntries = [];
-while ($row = $portfolioResult->fetchArray(SQLITE3_ASSOC)) {
-    $portfolioEntries[] = $row;
-}
+$portfolioQuery->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+$portfolioQuery->execute();
+$portfolioEntries = $portfolioQuery->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="sv">

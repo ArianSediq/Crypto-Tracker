@@ -3,7 +3,7 @@
 include '../php/session.php';
 include '../config.php';
 
-$db = new SQLite3(DB_FILE);
+$db = $pdo;
 
 // Lägg till nytt innehav
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add'])) {
@@ -12,9 +12,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add'])) {
     $user_id = $_SESSION["user_id"];
     
     $stmt = $db->prepare("INSERT INTO portfolio (user_id, crypto_symbol, amount) VALUES (:user_id, :crypto, :amount)");
-    $stmt->bindValue(':user_id', $user_id, SQLITE3_INTEGER);
-    $stmt->bindValue(':crypto', $crypto, SQLITE3_TEXT);
-    $stmt->bindValue(':amount', $amount, SQLITE3_FLOAT);
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->bindParam(':crypto', $crypto, PDO::PARAM_STR);
+    $stmt->bindParam(':amount', $amount, PDO::PARAM_STR);
     $stmt->execute();
 }
 
@@ -22,8 +22,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add'])) {
 if (isset($_GET["delete"])) {
     $delete_id = (int)$_GET["delete"];
     $stmt = $db->prepare("DELETE FROM portfolio WHERE id = :id AND user_id = :user_id");
-    $stmt->bindValue(':id', $delete_id, SQLITE3_INTEGER);
-    $stmt->bindValue(':user_id', $_SESSION["user_id"], SQLITE3_INTEGER);
+    $stmt->bindParam(':id', $delete_id, PDO::PARAM_INT);
+    $stmt->bindParam(':user_id', $_SESSION["user_id"], PDO::PARAM_INT);
     $stmt->execute();
     header("Location: portfolio.php");
     exit;
@@ -32,12 +32,9 @@ if (isset($_GET["delete"])) {
 // Hämta innehav
 $user_id = $_SESSION["user_id"];
 $stmt = $db->prepare("SELECT id, crypto_symbol, amount FROM portfolio WHERE user_id = :user_id");
-$stmt->bindValue(':user_id', $user_id, SQLITE3_INTEGER);
-$result = $stmt->execute();
-$portfolioEntries = [];
-while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-    $portfolioEntries[] = $row;
-}
+$stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+$stmt->execute();
+$portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="sv">

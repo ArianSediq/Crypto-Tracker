@@ -1,15 +1,22 @@
 <?php
 session_start();
 include '../config.php';
-$db = new SQLite3(DB_FILE);
+// Use the PDO connection from config.php
+$db = $pdo;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim(htmlspecialchars($_POST["username"]));
+    $email = trim(filter_var($_POST["email"], FILTER_SANITIZE_EMAIL));
     $password = $_POST["password"];
 
     // Server-side validation: Username
     if (strlen($username) < 3 || !preg_match('/^[a-zA-Z0-9]+$/', $username)) {
         die("❌ Ogiltigt användarnamn.");
+    }
+
+    // Server-side validation: Email
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        die("❌ Ogiltig e-postadress.");
     }
 
     // Server-side validation: Password
@@ -18,21 +25,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Prevent duplicate usernames
-    $check_query = $db->prepare("SELECT COUNT(*) FROM users WHERE username = :username");
-    $check_query->bindValue(":username", $username, SQLITE3_TEXT);
-    $result = $check_query->execute()->fetchArray()[0];
+    $check_query = $db->prepare("SELECT COUNT(*) FROM users WHERE username = :username OR email = :email");
+    $check_query->bindParam(":username", $username, PDO::PARAM_STR);
+    $check_query->bindParam(":email", $email, PDO::PARAM_STR);
+    $result = $check_query->execute();
+    $count = $check_query->fetchColumn();
 
-    if ($result > 0) {
-        die("⚠ Användarnamnet är redan taget. Välj ett annat!");
+    if ($count > 0) {
+        die("⚠ Användarnamnet eller e-postadressen är redan registrerad.");
     }
 
     // Secure password hash
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
     // Insert user into database
-    $query = $db->prepare("INSERT INTO users (username, password, role) VALUES (:username, :password, 'user')");
-    $query->bindValue(":username", $username, SQLITE3_TEXT);
-    $query->bindValue(":password", $hashed_password, SQLITE3_TEXT);
+    $query = $db->prepare("INSERT INTO users (username, email, password, role) VALUES (:username, :email, :password, 'user')");
+    $query->bindParam(":username", $username, PDO::PARAM_STR);
+    $query->bindParam(":email", $email, PDO::PARAM_STR);
+    $query->bindParam(":password", $hashed_password, PDO::PARAM_STR);
 
     if ($query->execute()) {
         header("Location: login.php"); // Redirect on success
@@ -56,12 +66,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h2>Registrera konto</h2>
         <form id="register-form" method="post">
             <input type="text" id="username" name="username" placeholder="Användarnamn" required>
+            <input type="email" id="email" name="email" placeholder="E-postadress" required>
             <input type="password" id="password" name="password" placeholder="Lösenord" required>
             <button type="submit">Registrera</button>
             <div id="error-message"></div> <!-- Error container for client-side validation -->
         </form>
-
-
     </div>
     
     <script src="../js/validate.js"></script>

@@ -1,7 +1,7 @@
 <?php
 session_start();
 include '../config.php';
-$db = new SQLite3(DB_FILE);
+$db = $pdo;
 
 // Om POST, försök logga in
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -9,8 +9,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST["password"];
     
     $query = $db->prepare("SELECT * FROM users WHERE username = :username");
-    $query->bindValue(":username", $username, SQLITE3_TEXT);
-    $result = $query->execute()->fetchArray();
+    $query->bindParam(":username", $username, PDO::PARAM_STR);
+    $query->execute();
+    $result = $query->fetch(PDO::FETCH_ASSOC);
     
     if ($result && password_verify($password, $result["password"])) {
         $_SESSION["user_id"] = $result["id"];
