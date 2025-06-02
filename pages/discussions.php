@@ -3,6 +3,11 @@ require_once '../php/session.php';
 require_once '../config.php';
 require_once '../api/fetch_crypto.php';
 
+// Sort the cryptocurrency data alphabetically by name
+usort($data, function($a, $b) {
+    return strcasecmp($a['name'], $b['name']);
+});
+
 try {
     $db = new PDO('sqlite:' . __DIR__ . '/../db/crypto_tracker.db');
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -32,11 +37,12 @@ try {
     <?php include '../header.php'; ?>
     
     <div class="container">
-        <h1>Kryptodiskussioner</h1>
+        
         
         <?php if (isset($_SESSION['user_id'])): ?>
             <!-- Formulär för att skapa nytt inlägg -->
             <div class="create-post">
+            <h1>Kryptodiskussioner</h1>
                 <h2>Skapa nytt inlägg</h2>
                 <form action="../api/create_post.php" method="POST" enctype="multipart/form-data">
                     <select name="crypto_symbol" required>
@@ -141,6 +147,7 @@ try {
                 </div>
             <?php endforeach; ?>
         </div>
+    </div>
     </div>
     
     <!-- Modal för att visa hela inlägg -->

@@ -34,7 +34,7 @@ body {
 }
 
 .container {
-    width: 100%;
+    width: 60%;
     max-width: 1400px;
     margin: 0 auto;
     padding: 1.5rem;
@@ -377,8 +377,8 @@ nav ul li a.active {
     gap: 0.5rem;
     background-color: var(--primary-color);
     color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.375rem;
     text-decoration: none;
     font-size: 0.85rem;
     font-weight: 500;
@@ -387,7 +387,7 @@ nav ul li a.active {
     border: none;
     cursor: pointer;
     margin-left: auto;
-    min-width: 120px;
+    min-width: 100px;
 }
 
 .create-post-btn:hover {
@@ -1412,6 +1412,12 @@ footer p {
     margin-top: 2rem;
 }
 
+.portfolio-overview h2 {
+    color: white;
+    margin-bottom: 1.5rem;
+    font-family: 'Montserrat', sans-serif;
+}
+
 .portfolio-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1516,12 +1522,16 @@ footer p {
 .submit-btn {
     background-color: var(--primary-color);
     color: white;
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 1rem;
     border: none;
-    border-radius: 6px;
+    border-radius: 0.375rem;
     font-weight: 500;
+    font-size: 0.875rem;
     cursor: pointer;
     transition: background-color 0.2s;
+    width: auto;
+    min-width: 120px;
+    display: inline-block;
 }
 
 .submit-btn:hover {
@@ -1567,6 +1577,262 @@ footer p {
 .login-prompt a:hover {
     text-decoration: underline;
     color: var(--secondary-color);
+}
+
+/* Discussion Page Styles */
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.post-card {
+    background: var(--card-background);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-color: var(--secondary-color);
+}
+
+.post-header {
+    margin-bottom: 1rem;
+}
+
+.post-header h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.25rem;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.post-meta {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.post-content {
+    color: var(--text-color);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.post-image {
+    margin: 1rem 0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.post-image img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.post-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.view-btn, .delete-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.view-btn {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.view-btn:hover {
+    background-color: #1d4ed8;
+}
+
+.delete-btn {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #dc2626;
+}
+
+.create-post {
+    background: var(--card-background);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.create-post h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+}
+
+.create-post form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.create-post select,
+.create-post input[type="text"],
+.create-post textarea {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background-color: var(--card-background);
+    color: var(--text-color);
+}
+
+.create-post select:focus,
+.create-post input[type="text"]:focus,
+.create-post textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.create-post textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.file-upload {
+    margin: 1rem 0;
+}
+
+.file-upload label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.filter-section {
+    margin: 2rem 0;
+    background: var(--card-background);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.filter-form {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-form select,
+.filter-form input[type="text"] {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    font-size: 0.95rem;
+    background-color: var(--card-background);
+    color: var(--text-color);
+}
+
+.filter-form button {
+    padding: 0.5rem 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-form button:hover {
+    background-color: #1d4ed8;
+}
+
+/* Discussion Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background-color: var(--card-background);
+    margin: 5% auto;
+    padding: 2rem;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.close {
+    position: absolute;
+    right: 1.5rem;
+    top: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #64748b;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.close:hover {
+    color: var(--text-color);
+}
+
+/* Discussion Responsive styles */
+@media (max-width: 768px) {
+    .posts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .modal-content {
+        margin: 10% 1rem;
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .post-actions {
+        flex-direction: column;
+    }
+
+    .view-btn, .delete-btn {
+        width: 100%;
+        text-align: center;
+    }
 }
 
 

@@ -2,6 +2,12 @@
 // Initiera session & konfiguration
 include '../php/session.php';
 include '../config.php';
+require_once '../api/fetch_crypto.php';
+
+// Sort the cryptocurrency data alphabetically by name
+usort($data, function($a, $b) {
+    return strcasecmp($a['name'], $b['name']);
+});
 
 $db = $pdo;
 
@@ -46,10 +52,11 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
     <?php include '../header.php'; ?>
     <div class="container">
-        <h1>Min Kryptoportfolio</h1>
+        
         
         <!-- Lägg till ny tillgång -->
         <div class="add-asset-form">
+            <h1>Min Kryptoportfolio</h1>
             <h2>Lägg till ny tillgång</h2>
             <form action="../api/add_to_portfolio.php" method="POST">
                 <div class="form-grid">
