@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $success_message = '';
 if (isset($_SESSION['register_success']) && $_SESSION['register_success']) {
     $username = isset($_SESSION['new_username']) ? htmlspecialchars($_SESSION['new_username']) : '';
-    $success_message = "✅ Ditt konto har skapats framgångsrikt! Du kan nu logga in.";
+    $success_message = "✅ Ditt konto har skapats! Du kan nu logga in.";
     unset($_SESSION['register_success']);
     unset($_SESSION['new_username']);
 }

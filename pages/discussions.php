@@ -136,8 +136,7 @@ try {
                     <div class="post-actions">
                         <button onclick="viewPost(<?= $post['id'] ?>)" class="view-btn">Läs mer</button>
                         
-                        <?php if (isset($_SESSION['user_id']) && 
-                                ($_SESSION['user_id'] === $post['user_id'] || $_SESSION['role'] === 'admin')): ?>
+                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                             <form action="../api/delete_post.php" method="POST" style="display: inline;">
                                 <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
                                 <button type="submit" class="delete-btn">Ta bort</button>

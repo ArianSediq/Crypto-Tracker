@@ -123,10 +123,11 @@ try {
                 <?php
                 try {
                     $stmt = $db->prepare("
-                        SELECT title, created_at 
-                        FROM posts 
-                        WHERE user_id = ? 
-                        ORDER BY created_at DESC 
+                        SELECT p.*, u.username 
+                        FROM posts p
+                        JOIN users u ON p.user_id = u.id
+                        WHERE p.user_id = ? 
+                        ORDER BY p.created_at DESC 
                         LIMIT 5
                     ");
                     $stmt->execute([$userId]);
@@ -136,8 +137,17 @@ try {
                         <div class="activity-list">
                             <?php foreach ($posts as $post): ?>
                                 <div class="activity-item">
-                                    <p><?= htmlspecialchars($post['title']) ?></p>
-                                    <small><?= date('Y-m-d H:i', strtotime($post['created_at'])) ?></small>
+                                    <div class="activity-content">
+                                        <p><?= htmlspecialchars($post['title']) ?></p>
+                                        <small><?= date('Y-m-d H:i', strtotime($post['created_at'])) ?></small>
+                                    </div>
+                                    <div class="activity-actions">
+                                        <button onclick="viewPost(<?= $post['id'] ?>)" class="view-btn small">Visa</button>
+                                        <form action="../api/delete_post.php" method="POST" style="display: inline;" onsubmit="return confirm('Är du säker på att du vill ta bort detta inlägg?');">
+                                            <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
+                                            <button type="submit" class="delete-btn small">Ta bort</button>
+                                        </form>
+                                    </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -151,6 +161,58 @@ try {
             </div>
         <?php endif; ?>
     </div>
+
+    <!-- Modal för att visa inlägg -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="postContent"></div>
+        </div>
+    </div>
+
+    <script>
+    function viewPost(postId) {
+        fetch(`../api/get_post.php?id=${postId}`)
+            .then(response => response.json())
+            .then(data => {
+                const modal = document.getElementById('postModal');
+                const content = document.getElementById('postContent');
+                content.innerHTML = `
+                    <h2>${data.title}</h2>
+                    <p class="post-meta">
+                        av ${data.username} | 
+                        ${data.crypto_symbol} | 
+                        ${new Date(data.created_at).toLocaleString('sv-SE')}
+                    </p>
+                    <div class="post-content">${data.content}</div>
+                    ${data.image_url ? `<div class="post-image">
+                        <img src="../${data.image_url}" alt="Inläggsbild">
+                    </div>` : ''}
+                `;
+                modal.style.display = "block";
+                document.body.classList.add('modal-open');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Kunde inte ladda inlägget. Försök igen senare.');
+            });
+    }
+
+    // Stäng modal när man klickar på X
+    document.querySelector('.close').onclick = function() {
+        document.getElementById('postModal').style.display = "none";
+        document.body.classList.remove('modal-open');
+    }
+
+    // Stäng modal när man klickar utanför
+    window.onclick = function(event) {
+        const modal = document.getElementById('postModal');
+        if (event.target == modal) {
+            modal.style.display = "none";
+            document.body.classList.remove('modal-open');
+        }
+    }
+    </script>
 
     <?php include '../php/footer.php'; ?>
 </body>
