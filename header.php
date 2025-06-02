@@ -6,7 +6,12 @@ require_once __DIR__ . '/php/session.php';
         <div class="logo">
             <a href="/Crypto-Tracker/">CryptoTracker</a>
         </div>
-        <ul>
+        <button class="mobile-menu-button" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <ul class="nav-links">
             <li><a href="/Crypto-Tracker/" <?= $_SERVER['REQUEST_URI'] == '/Crypto-Tracker/' ? 'class="active"' : '' ?>>Hem</a></li>
             <li><a href="/Crypto-Tracker/pages/search.php" <?= strpos($_SERVER['REQUEST_URI'], '/search.php') ? 'class="active"' : '' ?>>Sök</a></li>
             <?php if (isset($_SESSION['user_id'])): ?>
@@ -21,3 +26,10 @@ require_once __DIR__ . '/php/session.php';
         </ul>
     </nav>
 </header>
+
+<script>
+document.querySelector('.mobile-menu-button').addEventListener('click', function() {
+    this.classList.toggle('active');
+    document.querySelector('.nav-links').classList.toggle('active');
+});
+</script>
