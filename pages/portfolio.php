@@ -41,10 +41,10 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <title>Min Portfolio - Cryptotracker</title>
-    <link rel="stylesheet" href="../css/styles.css"> <!-- CSS -->
+    <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-    <?php include '../header.php'; ?> <!-- Header -->
+    <?php include '../header.php'; ?>
     <div class="container">
         <h1>Min Kryptoportfolio</h1>
         
@@ -52,20 +52,34 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="add-asset-form">
             <h2>Lägg till ny tillgång</h2>
             <form action="../api/add_to_portfolio.php" method="POST">
-                <select name="crypto_symbol" required>
-                    <?php foreach ($data as $coin): ?>
-                        <option value="<?= htmlspecialchars($coin['symbol']) ?>">
-                            <?= htmlspecialchars($coin['name']) ?> (<?= htmlspecialchars($coin['symbol']) ?>)
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <input type="number" name="amount" step="0.00000001" placeholder="Antal" required>
-                <input type="number" name="purchase_price" step="0.01" placeholder="Köppris (USD)" required>
-                <button type="submit">Lägg till</button>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="crypto_symbol">Kryptovaluta</label>
+                        <select name="crypto_symbol" id="crypto_symbol" required>
+                            <option value="" disabled selected>Välj kryptovaluta</option>
+                            <?php foreach ($data as $coin): ?>
+                                <option value="<?= htmlspecialchars($coin['symbol']) ?>">
+                                    <?= htmlspecialchars($coin['name']) ?> (<?= htmlspecialchars($coin['symbol']) ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="amount">Antal</label>
+                        <input type="number" id="amount" name="amount" step="0.00000001" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="purchase_price">Köppris (USD)</label>
+                        <input type="number" id="purchase_price" name="purchase_price" step="0.01" required>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">Lägg till i portfolio</button>
             </form>
         </div>
         
-        <!-- Visa portfolio -->
+        <!-- Portfolio översikt -->
         <div class="portfolio-overview">
             <h2>Mina Tillgångar</h2>
             <?php if (!empty($portfolioEntries)): ?>
@@ -73,7 +87,6 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php foreach ($portfolioEntries as $asset): ?>
                         <div class="portfolio-item">
                             <?php
-                            // Hitta aktuellt pris från API-data
                             $current_price = 0;
                             foreach ($data as $coin) {
                                 if ($coin['symbol'] === $asset['crypto_symbol']) {
@@ -83,39 +96,64 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             }
                             
                             $total_value = $asset['amount'] * $current_price;
-                            $profit_loss = $total_value - ($asset['amount'] * $asset['purchase_price']);
-                            $profit_loss_percent = ($profit_loss / ($asset['amount'] * $asset['purchase_price'])) * 100;
+                            $profit_loss = isset($asset['purchase_price']) ? 
+                                         $total_value - ($asset['amount'] * $asset['purchase_price']) : 0;
+                            $profit_loss_percent = isset($asset['purchase_price']) && $asset['purchase_price'] > 0 ? 
+                                                 ($profit_loss / ($asset['amount'] * $asset['purchase_price'])) * 100 : 0;
                             ?>
                             
-                            <h3><?= htmlspecialchars($asset['crypto_symbol']) ?></h3>
-                            <p>Antal: <?= number_format($asset['amount'], 8) ?></p>
-                            <p>Köppris: $<?= number_format($asset['purchase_price'], 2) ?></p>
-                            <p>Nuvarande värde: $<?= number_format($total_value, 2) ?></p>
-                            <p class="<?= $profit_loss >= 0 ? 'profit' : 'loss' ?>">
-                                <?= $profit_loss >= 0 ? '+' : '' ?><?= number_format($profit_loss, 2) ?> USD
-                                (<?= number_format($profit_loss_percent, 2) ?>%)
-                            </p>
-                            <form action="../api/remove_from_portfolio.php" method="POST" class="delete-form">
-                                <input type="hidden" name="portfolio_id" value="<?= $asset['id'] ?>">
-                                <button type="submit" class="delete-btn">Ta bort</button>
-                            </form>
+                            <div class="asset-header">
+                                <h3><?= htmlspecialchars($asset['crypto_symbol']) ?></h3>
+                                <form action="../api/remove_from_portfolio.php" method="POST" class="delete-form">
+                                    <input type="hidden" name="portfolio_id" value="<?= $asset['id'] ?>">
+                                    <button type="submit" class="delete-btn" title="Ta bort">×</button>
+                                </form>
+                            </div>
+                            
+                            <div class="asset-details">
+                                <p>
+                                    <span class="label">Antal:</span>
+                                    <span class="value"><?= number_format($asset['amount'], 8) ?></span>
+                                </p>
+                                <?php if (isset($asset['purchase_price'])): ?>
+                                <p>
+                                    <span class="label">Köppris:</span>
+                                    <span class="value">$<?= number_format($asset['purchase_price'], 2) ?></span>
+                                </p>
+                                <?php endif; ?>
+                                <p>
+                                    <span class="label">Nuvarande värde:</span>
+                                    <span class="value">$<?= number_format($total_value, 2) ?></span>
+                                </p>
+                                <?php if (isset($asset['purchase_price'])): ?>
+                                <p class="profit-loss <?= $profit_loss >= 0 ? 'profit' : 'loss' ?>">
+                                    <span class="label">Vinst/Förlust:</span>
+                                    <span class="value">
+                                        <?= $profit_loss >= 0 ? '+' : '' ?><?= number_format($profit_loss, 2) ?> USD
+                                        (<?= number_format($profit_loss_percent, 2) ?>%)
+                                    </span>
+                                </p>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
                 
-                <!-- Portfolio värde över tid (chart) -->
+                <!-- Portfolio värde över tid -->
                 <div class="portfolio-chart">
                     <h2>Portfoliovärde över tid</h2>
                     <canvas id="portfolioChart"></canvas>
                 </div>
             <?php else: ?>
-                <p>Din portfolio är tom. Börja med att lägga till några tillgångar!</p>
+                <div class="empty-portfolio">
+                    <p>Din portfolio är tom. Börja med att lägga till några tillgångar!</p>
+                </div>
             <?php endif; ?>
         </div>
     </div>
     
     <script>
-    // Enkel chart för att visa portfoliovärde
+    // Portfolio chart
     const ctx = document.getElementById('portfolioChart').getContext('2d');
     new Chart(ctx, {
         type: 'line',
@@ -143,7 +181,7 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
     });
     </script>
     
-    <?php include '../php/footer.php'; ?> <!-- Footer -->
+    <?php include '../php/footer.php'; ?>
 </body>
 </html>
 

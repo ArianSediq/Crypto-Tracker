@@ -28,11 +28,6 @@ include 'api/fetch_crypto.php'; // Load API logic
     </div>
   <?php } else { ?>
     <div class="container">
-      <div class="welcome-section">
-        <h1>Välkommen till Cryptotracker</h1>
-        <p>Håll dig uppdaterad med de senaste kryptonyheterna och priserna.</p>
-      </div>
-
       <div class="main-content-grid">
         <!-- Crypto Prices Section -->
         <div class="crypto-container">

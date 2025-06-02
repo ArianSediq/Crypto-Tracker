@@ -10,6 +10,20 @@ document.addEventListener("DOMContentLoaded", function () {
     // Initial data fetch
     fetchCryptoData('');
 
+    // Prevent clicks on search results except for the create post button
+    resultContainer.addEventListener('click', function(e) {
+        // Only allow clicks on the create-post-btn
+        if (!e.target.classList.contains('create-post-btn')) {
+            e.preventDefault();
+            // If the clicked element is a child of create-post-btn, find the button and click it
+            const createPostBtn = e.target.closest('.create-post-btn');
+            if (createPostBtn) {
+                createPostBtn.click();
+            }
+            return false;
+        }
+    });
+
     async function fetchCryptoData(query) {
         try {
             // Don't show loading for empty queries
@@ -67,86 +81,71 @@ document.addEventListener("DOMContentLoaded", function () {
                         `https://cryptoicons.org/api/icon/${coin.symbol.toLowerCase()}/200`
                     ];
 
-                    const resultItem = document.createElement("a");
+                    const resultItem = document.createElement("div");
                     resultItem.classList.add("search-result");
-                    resultItem.href = `coin_info.php?id=${coin.id}`;
+                    resultItem.style.cursor = "default";
                     
                     resultItem.innerHTML = `
-                        <div class="crypto-result">
-                            <img src="${logoUrls[0]}" 
-                                 alt="${coin.name}" 
-                                 class="crypto-logo"
-                                 onerror="this.onerror=null; this.src='${logoUrls[1]}'; this.onerror=null;">
-                            <div class="crypto-info">
-                                <h3>${coin.name} <span class="crypto-symbol">${coin.symbol}</span></h3>
-                                <p class="crypto-price">$${parseFloat(coin.price_usd).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</p>
-                                <p class="crypto-change ${priceChangeClass}">${priceChangeSymbol} ${Math.abs(priceChange).toFixed(2)}% (24h)</p>
+                        <div class="crypto-result" style="cursor: default;">
+                            <img src="${logoUrls[0]}" alt="${coin.name} Logo" class="crypto-logo" style="cursor: default;"
+                                 onerror="this.onerror=null;this.src='${logoUrls[1]}';"/>
+                            <div class="crypto-info" style="cursor: default;">
+                                <h3 style="cursor: default;">${coin.name} <span class="crypto-symbol">${coin.symbol}</span></h3>
+                                <p class="crypto-price" style="cursor: default;">$${parseFloat(coin.price_usd).toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                <p class="${priceChangeClass}" style="cursor: default;">${priceChangeSymbol} ${priceChange.toFixed(2)}%</p>
                             </div>
-                            <div class="crypto-market-info">
-                                <p>Rank: #${coin.rank}</p>
-                                <p>Market Cap: $${parseFloat(coin.market_cap_usd).toLocaleString('en-US', { maximumFractionDigits: 0 })}</p>
+                            <div class="crypto-market-info" style="cursor: default;">
+                                <p style="cursor: default;">Rank: #${coin.rank}</p>
+                                <p style="cursor: default;">Volym 24h: $${parseInt(coin.volume24).toLocaleString('sv-SE')}</p>
                             </div>
+                            <a href="discussions.php?coin_id=${coin.id}" class="create-post-btn">
+                                📝 Skapa inlägg
+                            </a>
                         </div>
                     `;
-
+                    
                     resultContainer.appendChild(resultItem);
                 });
             } else {
-                statusContainer.innerHTML = "❌ Inga kryptovalutor hittades!";
+                statusContainer.innerHTML = "❌ Inga resultat hittades";
                 resultContainer.innerHTML = `
                     <div class="no-results">
-                        <p>Inga resultat hittades för "${query}"</p>
-                        <p>Försök med ett annat namn eller symbol</p>
+                        <p>Inga kryptovalutor matchade din sökning.</p>
+                        <p>Försök med ett annat namn eller symbol.</p>
                     </div>
                 `;
             }
         } catch (error) {
-            console.error('Error:', error);
-            statusContainer.innerHTML = "❌ Ett fel uppstod vid sökningen";
+            console.error("Error:", error);
+            statusContainer.innerHTML = "⚠ Ett fel uppstod vid sökningen";
             resultContainer.innerHTML = `
                 <div class="error-message">
-                    <p>Kunde inte hämta kryptovalutor</p>
-                    <p>Var god försök igen senare</p>
+                    <p>Kunde inte hämta kryptovalutor.</p>
+                    <p>Vänligen försök igen senare.</p>
                 </div>
             `;
         }
     }
 
-    // Real-time search with debouncing
+    // Search on input with debounce
     searchInput.addEventListener("input", function() {
         clearTimeout(searchTimeout);
         const query = this.value.trim();
         
-        // Don't search if the query hasn't changed
+        // Don't search if query hasn't changed
         if (query === lastQuery) return;
         lastQuery = query;
         
-        if (query.length >= 1) {
-            searchTimeout = setTimeout(() => {
-                fetchCryptoData(query);
-            }, 300); // Wait 300ms after user stops typing
-        } else {
-            // Show initial top 10 when search is cleared
-            fetchCryptoData('');
-        }
+        searchTimeout = setTimeout(() => {
+            fetchCryptoData(query);
+        }, 300);
     });
 
-    // Button click search
-    searchButton.addEventListener("click", function () {
+    // Search on button click
+    searchButton.addEventListener("click", function() {
         const query = searchInput.value.trim();
-        if (query.length > 0) {
-            fetchCryptoData(query);
-        } else {
-            fetchCryptoData('');
-        }
-    });
-
-    // Allow search with Enter key
-    searchInput.addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            const query = this.value.trim();
-            fetchCryptoData(query);
-        }
+        if (query === lastQuery) return;
+        lastQuery = query;
+        fetchCryptoData(query);
     });
 });
