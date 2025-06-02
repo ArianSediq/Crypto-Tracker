@@ -13,6 +13,9 @@ require_once __DIR__ . '/php/session.php';
                 <li><a href="/Crypto-Tracker/pages/portfolio.php" <?= strpos($_SERVER['REQUEST_URI'], '/portfolio.php') ? 'class="active"' : '' ?>>Portfolio</a></li>
                 <li><a href="/Crypto-Tracker/pages/discussions.php" <?= strpos($_SERVER['REQUEST_URI'], '/discussions.php') ? 'class="active"' : '' ?>>Diskussioner</a></li>
                 <li><a href="/Crypto-Tracker/pages/profile.php" <?= strpos($_SERVER['REQUEST_URI'], '/profile.php') ? 'class="active"' : '' ?>>Min Profil</a></li>
+                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                    <li><a href="/Crypto-Tracker/pages/admin/dashboard.php" <?= strpos($_SERVER['REQUEST_URI'], '/admin/') ? 'class="active"' : '' ?>>Admin</a></li>
+                <?php endif; ?>
                 <li><a href="/Crypto-Tracker/pages/logout.php">Logga ut</a></li>
             <?php else: ?>
                 <li><a href="/Crypto-Tracker/pages/login.php" <?= strpos($_SERVER['REQUEST_URI'], '/login.php') ? 'class="active"' : '' ?>>Logga in</a></li>
