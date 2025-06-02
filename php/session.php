@@ -5,8 +5,9 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // auth
-if (!isset($_SESSION["user_id"])) {
-    header("Location: ../pages/login.php"); // omdirigera
-    exit;
-}
+// if (!isset($_SESSION["user_id"])) {
+ //   header("Location: ../pages/login.php"); // omdirigera
+ //   exit;
+//}
+
 ?>

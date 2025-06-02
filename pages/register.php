@@ -65,6 +65,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
     
     <script src="../js/validate.js"></script>
+
+    <?php include '../php/footer.php'; ?>
 </body>
 
 </html>
