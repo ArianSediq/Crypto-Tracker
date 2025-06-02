@@ -15,11 +15,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if ($result && password_verify($password, $result["password"])) {
         $_SESSION["user_id"] = $result["id"];
-        header("Location: dashboard.php");
+        header("Location: ../index.php");
         exit;
     } else {
         $error = "Felaktigt användarnamn eller lösenord!";
     }
+}
+
+// Get registration success message if it exists
+$success_message = '';
+if (isset($_SESSION['register_success']) && $_SESSION['register_success']) {
+    $username = isset($_SESSION['new_username']) ? htmlspecialchars($_SESSION['new_username']) : '';
+    $success_message = "✅ Ditt konto har skapats framgångsrikt! Du kan nu logga in.";
+    unset($_SESSION['register_success']);
+    unset($_SESSION['new_username']);
 }
 ?>
 <!DOCTYPE html>
@@ -29,12 +38,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <title>Logga in - Kryptotracker</title>
   <!-- Absolut CSS-sökväg (eftersom denna fil ligger i /pages/) -->
   <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .success-message {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        text-align: center;
+    }
+  </style>
 </head>
 <body>
   <?php include '../header.php'; ?>
   
   <div class="container">
       <h2>Logga in</h2>
+      
+      <?php if ($success_message): ?>
+          <div class="success-message">
+              <?php echo $success_message; ?>
+          </div>
+      <?php endif; ?>
       
       <?php
       // Visa eventuellt felmeddelande

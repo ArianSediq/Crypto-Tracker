@@ -45,7 +45,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $query->bindParam(":password", $hashed_password, PDO::PARAM_STR);
 
     if ($query->execute()) {
-        header("Location: login.php"); // Redirect on success
+        $_SESSION['register_success'] = true;
+        $_SESSION['new_username'] = $username;
+        header("Location: login.php");
         exit();
     } else {
         die("⚠ Fel vid registrering, försök igen!");
