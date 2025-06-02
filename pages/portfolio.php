@@ -12,27 +12,77 @@ usort($data, function($a, $b) {
 $db = $pdo;
 
 // Lägg till nytt innehav
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add'])) {
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['crypto_symbol'])) {
     $crypto = trim($_POST["crypto_symbol"]);
     $amount = trim($_POST["amount"]);
+    $purchase_price = trim($_POST["purchase_price"]);
     $user_id = $_SESSION["user_id"];
     
-    $stmt = $db->prepare("INSERT INTO portfolio (user_id, crypto_symbol, amount) VALUES (:user_id, :crypto, :amount)");
-    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-    $stmt->bindParam(':crypto', $crypto, PDO::PARAM_STR);
-    $stmt->bindParam(':amount', $amount, PDO::PARAM_STR);
-    $stmt->execute();
+    try {
+        $stmt = $db->prepare("INSERT INTO portfolio (user_id, crypto_symbol, amount, purchase_price) VALUES (:user_id, :crypto, :amount, :purchase_price)");
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindParam(':crypto', $crypto, PDO::PARAM_STR);
+        $stmt->bindParam(':amount', $amount, PDO::PARAM_STR);
+        $stmt->bindParam(':purchase_price', $purchase_price, PDO::PARAM_STR);
+        $stmt->execute();
+        
+        // Return JSON response for AJAX requests
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, 'message' => 'Tillgång tillagd i portfolion.']);
+            exit;
+        }
+        
+        // Redirect for non-AJAX requests (fallback)
+        header("Location: portfolio.php");
+        exit;
+    } catch(PDOException $e) {
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'Databasfel: ' . $e->getMessage()]);
+            exit;
+        }
+        // Handle non-AJAX error
+        $_SESSION['error'] = 'Ett fel uppstod: ' . $e->getMessage();
+        header("Location: portfolio.php");
+        exit;
+    }
 }
 
 // Ta bort innehav
-if (isset($_GET["delete"])) {
-    $delete_id = (int)$_GET["delete"];
-    $stmt = $db->prepare("DELETE FROM portfolio WHERE id = :id AND user_id = :user_id");
-    $stmt->bindParam(':id', $delete_id, PDO::PARAM_INT);
-    $stmt->bindParam(':user_id', $_SESSION["user_id"], PDO::PARAM_INT);
-    $stmt->execute();
-    header("Location: portfolio.php");
-    exit;
+if (isset($_POST['action']) && $_POST['action'] === 'delete') {
+    $portfolio_id = filter_input(INPUT_POST, 'portfolio_id', FILTER_VALIDATE_INT);
+    
+    try {
+        // Verifiera att tillgången tillhör användaren
+        $stmt = $db->prepare("SELECT crypto_symbol FROM portfolio WHERE id = ? AND user_id = ?");
+        $stmt->execute([$portfolio_id, $_SESSION['user_id']]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($result) {
+            // Ta bort tillgången
+            $stmt = $db->prepare("DELETE FROM portfolio WHERE id = ? AND user_id = ?");
+            $stmt->execute([$portfolio_id, $_SESSION['user_id']]);
+            
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'message' => $result['crypto_symbol'] . ' har tagits bort från din portfolio.']);
+                exit;
+            }
+        } else {
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                header('HTTP/1.1 403 Forbidden');
+                echo json_encode(['success' => false, 'error' => 'Du har inte behörighet att ta bort denna tillgång.']);
+                exit;
+            }
+        }
+    } catch(PDOException $e) {
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            header('HTTP/1.1 500 Internal Server Error');
+            echo json_encode(['success' => false, 'error' => 'Databasfel: ' . $e->getMessage()]);
+            exit;
+        }
+    }
 }
 
 // Hämta innehav
@@ -52,13 +102,13 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
     <?php include '../header.php'; ?>
     <div class="container">
-        
+        <div id="success-message" class="success-message" style="display: none;"></div>
         
         <!-- Lägg till ny tillgång -->
         <div class="add-asset-form">
             <h1>Min Kryptoportfolio</h1>
             <h2>Lägg till ny tillgång</h2>
-            <form action="../api/add_to_portfolio.php" method="POST">
+            <form id="add-asset-form" method="POST">
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="crypto_symbol">Kryptovaluta</label>
@@ -82,7 +132,12 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <input type="number" id="purchase_price" name="purchase_price" step="0.01" required>
                     </div>
                 </div>
-                <button type="submit" class="submit-btn">Lägg till i portfolio</button>
+                <div class="form-actions">
+                    <button type="submit" class="action-button">
+                        <span class="button-icon">+</span>
+                        <span class="button-text">Lägg till i portfolio</span>
+                    </button>
+                </div>
             </form>
         </div>
         
@@ -111,8 +166,9 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             
                             <div class="asset-header">
                                 <h3><?= htmlspecialchars($asset['crypto_symbol']) ?></h3>
-                                <form action="../api/remove_from_portfolio.php" method="POST" class="delete-form">
+                                <form class="delete-form" onsubmit="return deleteAsset(event, <?= $asset['id'] ?>, '<?= htmlspecialchars($asset['crypto_symbol']) ?>')">
                                     <input type="hidden" name="portfolio_id" value="<?= $asset['id'] ?>">
+                                    <input type="hidden" name="action" value="delete">
                                     <button type="submit" class="delete-btn" title="Ta bort">×</button>
                                 </form>
                             </div>
@@ -186,6 +242,91 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
         }
     });
+    </script>
+    
+    <script>
+    document.getElementById('add-asset-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch('portfolio.php', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const successMessage = document.getElementById('success-message');
+                const cryptoName = document.getElementById('crypto_symbol').options[document.getElementById('crypto_symbol').selectedIndex].text;
+                successMessage.textContent = cryptoName + ' har lagts till i din portfolio!';
+                successMessage.style.display = 'block';
+                
+                // Reset form
+                document.getElementById('add-asset-form').reset();
+                
+                // Hide message after 3 seconds
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                    // Reload the page to show the updated portfolio
+                    window.location.reload();
+                }, 3000);
+            } else {
+                alert('Ett fel uppstod: ' + (data.error || 'Okänt fel'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ett fel uppstod när tillgången skulle läggas till.');
+        });
+    });
+    </script>
+    
+    <script>
+    function deleteAsset(event, portfolioId, symbol) {
+        event.preventDefault();
+        
+        if (!confirm('Är du säker på att du vill ta bort ' + symbol + ' från din portfolio?')) {
+            return false;
+        }
+        
+        const formData = new FormData();
+        formData.append('portfolio_id', portfolioId);
+        formData.append('action', 'delete');
+        
+        fetch('portfolio.php', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const successMessage = document.getElementById('success-message');
+                successMessage.textContent = data.message;
+                successMessage.style.display = 'block';
+                
+                // Hide message after 3 seconds and reload
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                    window.location.reload();
+                }, 3000);
+            } else {
+                alert('Ett fel uppstod: ' + (data.error || 'Okänt fel'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ett fel uppstod när tillgången skulle tas bort.');
+        });
+        
+        return false;
+    }
     </script>
     
     <?php include '../php/footer.php'; ?>
