@@ -87,7 +87,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete') {
 
 // Hämta innehav
 $user_id = $_SESSION["user_id"];
-$stmt = $db->prepare("SELECT id, crypto_symbol, amount FROM portfolio WHERE user_id = :user_id");
+$stmt = $db->prepare("SELECT id, crypto_symbol, amount, purchase_price FROM portfolio WHERE user_id = :user_id");
 $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
 $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -101,9 +101,8 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
     <?php include '../header.php'; ?>
+    <div id="success-message" class="success-message"></div>
     <div class="container">
-        <div id="success-message" class="success-message" style="display: none;"></div>
-        
         <!-- Lägg till ny tillgång -->
         <div class="add-asset-form">
             <h1>Min Kryptoportfolio</h1>
@@ -128,7 +127,7 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     
                     <div class="form-group">
-                        <label for="purchase_price">Köppris (USD)</label>
+                        <label for="purchase_price">Totalt köppris (USD)</label>
                         <input type="number" id="purchase_price" name="purchase_price" step="0.01" required>
                     </div>
                 </div>
@@ -158,10 +157,9 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             }
                             
                             $total_value = $asset['amount'] * $current_price;
-                            $profit_loss = isset($asset['purchase_price']) ? 
-                                         $total_value - ($asset['amount'] * $asset['purchase_price']) : 0;
-                            $profit_loss_percent = isset($asset['purchase_price']) && $asset['purchase_price'] > 0 ? 
-                                                 ($profit_loss / ($asset['amount'] * $asset['purchase_price'])) * 100 : 0;
+                            $total_purchase_value = isset($asset['purchase_price']) ? $asset['purchase_price'] : 0;
+                            $profit_loss = $total_value - $total_purchase_value;
+                            $profit_loss_percent = $total_purchase_value > 0 ? ($profit_loss / $total_purchase_value) * 100 : 0;
                             ?>
                             
                             <div class="asset-header">
@@ -192,7 +190,7 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <p class="profit-loss <?= $profit_loss >= 0 ? 'profit' : 'loss' ?>">
                                     <span class="label">Vinst/Förlust:</span>
                                     <span class="value">
-                                        <?= $profit_loss >= 0 ? '+' : '' ?><?= number_format($profit_loss, 2) ?> USD
+                                        <?= $profit_loss >= 0 ? '+' : '' ?>$<?= number_format($profit_loss, 2) ?>
                                         (<?= number_format($profit_loss_percent, 2) ?>%)
                                     </span>
                                 </p>
@@ -202,10 +200,54 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                 </div>
                 
-                <!-- Portfolio värde över tid -->
-                <div class="portfolio-chart">
-                    <h2>Portfoliovärde över tid</h2>
-                    <canvas id="portfolioChart"></canvas>
+                <!-- Portfolio Historik -->
+                <div class="portfolio-history">
+                    <h2>Portfolio Historik</h2>
+                    <div class="history-grid">
+                        <?php foreach ($portfolioEntries as $asset): ?>
+                            <?php
+                            $current_price = 0;
+                            $coin_name = '';
+                            foreach ($data as $coin) {
+                                if ($coin['symbol'] === $asset['crypto_symbol']) {
+                                    $current_price = $coin['price_usd'];
+                                    $coin_name = $coin['name'];
+                                    break;
+                                }
+                            }
+                            
+                            // Calculate per-coin prices and profit/loss
+                            $amount = floatval($asset['amount']);
+                            $per_coin_purchase = isset($asset['purchase_price']) ? ($asset['purchase_price'] / $amount) : 0;
+                            $total_current_value = $amount * $current_price;
+                            $total_purchase_value = isset($asset['purchase_price']) ? $asset['purchase_price'] : 0;
+                            $profit_loss = $total_current_value - $total_purchase_value;
+                            $profit_loss_percentage = $total_purchase_value > 0 ? ($profit_loss / $total_purchase_value) * 100 : 0;
+                            ?>
+                            <div class="history-item">
+                                <div class="history-container coin-info">
+                                    <h3>Kryptovaluta</h3>
+                                    <p><?= htmlspecialchars($coin_name) ?> (<?= htmlspecialchars($asset['crypto_symbol']) ?>)</p>
+                                    <small>Antal: <?= number_format($amount, 8) ?></small>
+                                </div>
+                                <div class="history-container purchase-info">
+                                    <h3>Köpt för</h3>
+                                    <p>$<?= isset($asset['purchase_price']) ? number_format($asset['purchase_price'], 2) : '0.00' ?></p>
+                                    <small>Per mynt: $<?= number_format($per_coin_purchase, 2) ?></small>
+                                </div>
+                                <div class="history-container current-info">
+                                    <h3>Nuvarande pris</h3>
+                                    <p>$<?= number_format($current_price, 2) ?></p>
+                                    <small>Totalt värde: $<?= number_format($total_current_value, 2) ?></small>
+                                </div>
+                                <div class="history-container profit-loss-info <?= $profit_loss >= 0 ? 'profit' : 'loss' ?>">
+                                    <h3>Vinst/Förlust</h3>
+                                    <p><?= $profit_loss >= 0 ? '+' : '' ?>$<?= number_format($profit_loss, 2) ?></p>
+                                    <small><?= number_format($profit_loss_percentage, 2) ?>%</small>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             <?php else: ?>
                 <div class="empty-portfolio">
@@ -214,35 +256,6 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php endif; ?>
         </div>
     </div>
-    
-    <script>
-    // Portfolio chart
-    const ctx = document.getElementById('portfolioChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: Array.from({length: 7}, (_, i) => {
-                const d = new Date();
-                d.setDate(d.getDate() - (6 - i));
-                return d.toLocaleDateString('sv-SE');
-            }),
-            datasets: [{
-                label: 'Portfoliovärde (USD)',
-                data: [/* Här skulle historiska värden komma */],
-                borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-    </script>
     
     <script>
     document.getElementById('add-asset-form').addEventListener('submit', function(e) {
@@ -263,17 +276,18 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 const successMessage = document.getElementById('success-message');
                 const cryptoName = document.getElementById('crypto_symbol').options[document.getElementById('crypto_symbol').selectedIndex].text;
                 successMessage.textContent = cryptoName + ' har lagts till i din portfolio!';
-                successMessage.style.display = 'block';
+                successMessage.classList.add('show');
                 
                 // Reset form
                 document.getElementById('add-asset-form').reset();
                 
-                // Hide message after 3 seconds
+                // Hide message and reload after delay
                 setTimeout(() => {
-                    successMessage.style.display = 'none';
-                    // Reload the page to show the updated portfolio
-                    window.location.reload();
-                }, 3000);
+                    successMessage.classList.remove('show');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 300); // Wait for fade out animation
+                }, 2000);
             } else {
                 alert('Ett fel uppstod: ' + (data.error || 'Okänt fel'));
             }
@@ -283,9 +297,7 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
             alert('Ett fel uppstod när tillgången skulle läggas till.');
         });
     });
-    </script>
     
-    <script>
     function deleteAsset(event, portfolioId, symbol) {
         event.preventDefault();
         
@@ -309,13 +321,15 @@ $portfolioEntries = $stmt->fetchAll(PDO::FETCH_ASSOC);
             if (data.success) {
                 const successMessage = document.getElementById('success-message');
                 successMessage.textContent = data.message;
-                successMessage.style.display = 'block';
+                successMessage.classList.add('show');
                 
-                // Hide message after 3 seconds and reload
+                // Hide message and reload after delay
                 setTimeout(() => {
-                    successMessage.style.display = 'none';
-                    window.location.reload();
-                }, 3000);
+                    successMessage.classList.remove('show');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 300); // Wait for fade out animation
+                }, 2000);
             } else {
                 alert('Ett fel uppstod: ' + (data.error || 'Okänt fel'));
             }
