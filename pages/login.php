@@ -54,7 +54,7 @@ if (isset($_SESSION['register_success']) && $_SESSION['register_success']) {
   <?php include '../header.php'; ?>
   
   <div class="container">
-      <h2>Logga in</h2>
+      <h6>Logga in</h6>
       
       <?php if ($success_message): ?>
           <div class="success-message">

@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <?php include '../header.php'; ?>
     <div class="container">
-        <h2>Registrera konto</h2>
+        <h6>Registrera konto</h6>
         <form id="register-form" method="post">
             <input type="text" id="username" name="username" placeholder="Användarnamn" required>
             <input type="email" id="email" name="email" placeholder="E-postadress" required>

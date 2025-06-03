@@ -25,10 +25,49 @@ try {
             
             $message = "Din profil har uppdaterats!";
         }
+
+        // Handle profile image upload
+        if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
+            $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+            $file = $_FILES['profile_image'];
+            
+            if (!in_array($file['type'], $allowed_types)) {
+                $error = "Endast JPG, PNG och GIF-bilder är tillåtna.";
+            } else {
+                $upload_dir = __DIR__ . '/../uploads/profile_images/';
+                if (!file_exists($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                
+                $file_extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $new_filename = 'profile_' . $userId . '_' . time() . '.' . $file_extension;
+                $upload_path = $upload_dir . $new_filename;
+                
+                if (move_uploaded_file($file['tmp_name'], $upload_path)) {
+                    // Delete old profile image if exists
+                    $stmt = $db->prepare("SELECT profile_image FROM users WHERE id = ?");
+                    $stmt->execute([$userId]);
+                    $old_image = $stmt->fetchColumn();
+                    
+                    if ($old_image && file_exists(__DIR__ . '/../' . $old_image)) {
+                        unlink(__DIR__ . '/../' . $old_image);
+                    }
+                    
+                    // Update database with new image path
+                    $image_path = 'uploads/profile_images/' . $new_filename;
+                    $stmt = $db->prepare("UPDATE users SET profile_image = ? WHERE id = ?");
+                    $stmt->execute([$image_path, $userId]);
+                    
+                    $message = "Profilbild har uppdaterats!";
+                } else {
+                    $error = "Ett fel uppstod vid uppladdning av bilden.";
+                }
+            }
+        }
     }
 
     // Hämta användarinformation
-    $stmt = $db->prepare("SELECT username, email, bio, created_at FROM users WHERE id = ?");
+    $stmt = $db->prepare("SELECT username, email, bio, created_at, profile_image FROM users WHERE id = ?");
     $stmt->execute([$userId]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -70,8 +109,23 @@ try {
 
         <?php if ($user): ?>
             <div class="profile-card">
-            <h1>Min Profil</h1>
-                <h2><?= htmlspecialchars($user['username']) ?></h2>
+                <div class="profile-header">
+                    <div class="profile-info">
+                        <h1>Min Profil</h1>
+                        <h2><?= htmlspecialchars($user['username']) ?></h2>
+                    </div>
+                    <div class="profile-image-container">
+                        <img src="<?= $user['profile_image'] ? '../' . htmlspecialchars($user['profile_image']) : '../images/default-profile.png' ?>" 
+                             alt="" class="profile-image">
+                        <form method="POST" enctype="multipart/form-data" class="profile-image-form">
+                            <label for="profile_image" class="upload-label">
+                                <span>Ändra bild</span>
+                                <input type="file" id="profile_image" name="profile_image" accept="image/*" onchange="this.form.submit()" style="display: none;">
+                            </label>
+                        </form>
+                    </div>
+                </div>
+                
                 <p><strong>Email:</strong> <?= htmlspecialchars($user['email']) ?></p>
                 <p><strong>Medlem sedan:</strong> <?= date('Y-m-d', strtotime($user['created_at'])) ?></p>
                 
